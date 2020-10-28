@@ -22,12 +22,12 @@ class Optimizar{
             //Array Plantas
             $plantas = $parametros['plantas'];
             $string_plantas = "plantas = {";
-            $string_plantas .= implode(",", $plantas) ."}";
+            $string_plantas .= implode(",", $plantas) ."};";
 
             //Array produciones diarias
             $produccionesDiarias = $parametros['producciones'];
             $string_producciones = "produccionesDiarias = [";
-            $string_producciones .= implode(",", $produccionesDiarias) ."]";
+            $string_producciones .= implode(",", $produccionesDiarias) ."];";
 
             //Array de costos x 1 mw en cada planta
             $costos_array = $parametros['costos'];
@@ -36,26 +36,26 @@ class Optimizar{
             foreach($plantas as $planta){
                 $costos[]=$costos_array[$planta];
             }
-            $string_costos .= implode(",", $costos) ."]";
+            $string_costos .= implode(",", $costos) ."];";
 
             //Array de clientes
             $clientes = array_keys ($parametros["demanda"]);
             $string_clientes = "clientes = {";
-            $string_clientes .= implode(",", $clientes) ."}";
+            $string_clientes .= implode(",", $clientes) ."};";
 
             //Array dias 
             foreach($parametros["demanda"] as $demanda){
                 $dias = array_keys ($demanda);
             }
             $string_dias = "dias = {";
-            $string_dias .= implode(",", $dias) ."}";
+            $string_dias .= implode(",", $dias) ."};";
 
             //Array de demanda
             $string_demanda = "demanda = [";
             foreach($parametros["demanda"] as $demanda){
                 $string_demanda .= "|".implode(",", $demanda);
             }
-            $string_demanda .= "|]";
+            $string_demanda .= "|];";
             
 
             if (file_exists("prueba.dzn")){
@@ -86,8 +86,6 @@ class Optimizar{
 
         } catch (Exception $e) {
             $mensaje.= 'Excepción capturada: '.$e->getMessage()."\n";
-        } finally {
-            $mensaje .=  "Primer finally.\n";
         }
 
         $response = array(
@@ -98,7 +96,7 @@ class Optimizar{
 
         header('Access-Control-Allow-Origin: *');
         header('Content-type: application/json');
-        echo "Hola";
+        
         echo json_encode($response); 
     }
 }
