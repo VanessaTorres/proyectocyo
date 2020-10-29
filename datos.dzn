@@ -1,0 +1,6 @@
+plantas = {Nuclear,Hidroelectrica,Termica};
+produccionesDiarias = [100,100,100];
+costos = [100,100,100];
+clientes = {cliente1,cliente2};
+dias = {dia1,dia2};
+demanda = [|100,100|100,100|];

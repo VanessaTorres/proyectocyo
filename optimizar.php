@@ -12,7 +12,7 @@ if($_REQUEST){
 
 class Optimizar{
 
-    function crearArchivoDzn($parametros){       
+    function crearArchivoDzn($parametros){  
 
         try {
 
@@ -25,9 +25,13 @@ class Optimizar{
             $string_plantas .= implode(",", $plantas) ."};";
 
             //Array produciones diarias
-            $produccionesDiarias = $parametros['producciones'];
+            $producciones_array = $parametros['producciones'];
+            $producciones = array();
             $string_producciones = "produccionesDiarias = [";
-            $string_producciones .= implode(",", $produccionesDiarias) ."];";
+            foreach($plantas as $planta){
+                $producciones[]=$producciones_array[$planta];
+            }
+            $string_producciones .= implode(",", $producciones) ."];";
 
             //Array de costos x 1 mw en cada planta
             $costos_array = $parametros['costos'];
@@ -58,14 +62,14 @@ class Optimizar{
             $string_demanda .= "|];";
             
 
-            if (file_exists("prueba.dzn")){
-                unlink('prueba.dzn');
+            if (file_exists("datos.dzn")){
+                unlink('datos.dzn');
             }
 
         
 
             //Se crea el archivo
-            $fh = fopen("prueba.dzn", 'w') or  $mensaje .= "Se produjo un error al crear el archivo";
+            $fh = fopen("datos.dzn", 'w') or  $mensaje .= "Se produjo un error al crear el archivo";
             
             //Escribir Array Plantas
             fwrite($fh, $string_plantas.PHP_EOL) or  $mensaje .= "No se pudo escribir el array de plantas en el archivo\n";
@@ -83,7 +87,7 @@ class Optimizar{
             fclose($fh);
             
             $mensaje .=  "Se ha escrito sin problemas\n"; 
-
+            $mensaje .=  shell_exec("minizinc --solver osicbc planta.mzn datos.dzn");
         } catch (Exception $e) {
             $mensaje.= 'Excepción capturada: '.$e->getMessage()."\n";
         }

@@ -41,7 +41,7 @@
                                     <legend class="titulo_login">Bienvenidos</legend>
                                     <hr>
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <div class="form-group">
                                                 <label for="plantas">Plantas nucleares:*</label>
                                                 <select multiple class="form-control" id="plantas" name="plantas[]" required>
@@ -51,17 +51,62 @@
                                                 </select>
                                             </div>
                                         </div>
+                                    </div>
+                                    <hr/>
+                                    <div class="row">
                                         <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="producciones">Producciones diarias por planta:*</label>
-                                                <select multiple class="form-control" id="producciones" name="producciones[]" required>
-                                                  <option value="500" selected>Nuclear: 500 MW</option>
-                                                  <option value="450" selected>Hidroelectrica: 450 MW</option>
-                                                  <option value="380" selected>Termica: 380</option>
-                                                </select>
+                                            <label for="planta_producciones">Agregar producciones:</label>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <div class="col-md-5">
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text" id="basic-addon1">
+                                                                <i class="fa fa-lightbulb"></i>
+                                                            </span>
+                                                        </div>
+                                                        <select class="form-control" id="planta_producciones">
+                                                            <option value="Nuclear" >Nuclear</option>
+                                                            <option value="Hidroelectrica" >Hidroelectrica</option>
+                                                            <option value="Termica" >Termica</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text" id="basic-addon1">
+                                                                <i class="fa fa-bolt"></i>
+                                                            </span>
+                                                        </div>
+                                                        <input type="text" class="form-control" id="mwxdia">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button type="button" class="btn btn-primary" onclick="addMwXDia()">
+                                                        <i class="fa fa-paper-plane"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="contact_name">Listado de producciones de mw en un día:*</label>
+                                            <div style="margin-top: 10px;">
+                                                <table class="table" id="table_mwxdia">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Planta</th>
+                                                            <th>Producción mw por un día</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
+                                    <hr/>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <label for="phone_numbers">Agregar costos:</label>
@@ -103,9 +148,9 @@
                                                 <table class="table" id="table_costo">
                                                     <thead>
                                                         <tr>
-                                                            <th scope="col" colspan="2">Planta</th>
-                                                            <th scope="col" colspan="2">Costo</th>
-                                                            <th scope="col" colspan="2"></th>
+                                                            <th>Planta</th>
+                                                            <th>Costo</th>
+                                                            <th></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -115,6 +160,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <hr/>
                                 </fieldset>
 
 
@@ -204,6 +250,34 @@
 
         <script>
             let lineNo = 0;
+            let lineNoMwXDia = 0;
+
+            function addMwXDia() {
+
+                var planta_producciones = $("#planta_producciones").val();
+                var mwxdia = $("#mwxdia").val();
+
+                if (lineNoMwXDia == 3) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Oops...',
+                        text: 'Solo se puede ingresar la cantidad de mw por un dia para cada planta!',
+                    });
+                } else {
+                    if (planta_producciones != "" && mwxdia != "") {
+                        lineNoMwXDia++;
+                        var markup = "<tr id='item_" + lineNoMwXDia + "'><td>" + planta_producciones + " <input type='hidden' name='producciones[" + planta_producciones + "]' value='" + mwxdia + "'></td> <td>" + mwxdia + "</td> <td> <button type=\"button\" class=\"btn btn-danger\" onclick=\"removeMwXDia('item_" + lineNoMwXDia + "')\"><i class=\"fa fa-window-close\"></i> </button></td></tr>";
+                        var tableBody = $("#table_mwxdia tbody");
+                        tableBody.append(markup);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Debe seleccionar una planta e indicar la cantidad de mw que produce por un dia!',
+                        });
+                    }
+                }
+            }
 
             function addCosto() {
                 console.log($("#planta_costo").val());
@@ -231,9 +305,13 @@
                         });
                     }
                 }
+            }
 
-
-
+            function removeMwXDia(elemt) {
+                lineNoMwXDia--;
+                $('#' + elemt).fadeOut('slow', function() {
+                    $('#' + elemt).remove();
+                });
             }
 
             function removeCosto(elemt) {
@@ -284,12 +362,19 @@
                 //Petición
                 $("#optimizar").click(function() {
 
+                    var producciones = $("#table_mwxdia tbody").children().length;
                     var costos = $("#table_costo tbody").children().length;
                     var demanda = $("#table_costo_demanda tbody").children().length;
                     var cantidad_clientes = $("#cant_clientes").val();
                     var cantidad_dias = $("#cant_dias").val();
 
-                    if (costos <= 0 || costos < $("#plantas").children().length) {
+                    if (producciones <= 0 || producciones < $("#plantas").children().length) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Debe ingresar todos las porducciones de mw que se hace en un día por cada planta!',
+                        });
+                    } else if (costos <= 0 || costos < $("#plantas").children().length) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
@@ -321,7 +406,11 @@
                             data: $('#form_optimizar').serialize(),
                             dataType: 'json',
                             success: function(data) {
-                                console.log(data.data);
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Resultado!',
+                                    text: data.mensaje,
+                                });
                             },
                             error: function(data) {
                                 console.log('ERROR AJAX: ' + data);
