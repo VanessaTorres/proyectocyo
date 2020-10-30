@@ -406,10 +406,16 @@
                             data: $('#form_optimizar').serialize(),
                             dataType: 'json',
                             success: function(data) {
+                                var html = "<div class='overflow-auto'><ul class='list-group'>";
+                                for (var i = 0; i < data.data.length; i++) {
+                                    html += "<li class='list-group-item'>" + data.data[i] + "</li>";
+                                }
+                                html += "</ul></div>";
+
                                 Swal.fire({
                                     icon: 'info',
-                                    title: 'Resultado!',
-                                    text: data.mensaje,
+                                    title: 'Resultado!' + data.mensaje,
+                                    html: html,
                                 });
                             },
                             error: function(data) {

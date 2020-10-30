@@ -1,0 +1,9 @@
+% Archivo de datos
+plantas = { Nuclear, Hidroelectrica, Termica };
+produccionesDiarias = [ 500, 450, 380 ];
+costos = [ 1, 1.5, 2 ];
+
+clientes = { Cliente1, Cliente2 };
+dias =    { dia1, dia2,dia3,dia4 };
+demanda = [| 50, 200, 400,25
+          | 300, 50, 300,100 |];

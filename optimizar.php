@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set("America/Bogota");
+
 if($_REQUEST){    
     
     $modulo = isset($_REQUEST['modulo'])?$_REQUEST['modulo']:'';
@@ -62,14 +64,17 @@ class Optimizar{
             $string_demanda .= "|];";
             
 
-            if (file_exists("datos.dzn")){
+           /* if (file_exists("datos.dzn")){
                 unlink('datos.dzn');
-            }
+            }*/
 
-        
+            $fecha = new DateTime();
+            $nombre_file = "datos_";
+            $nombre_file .= str_replace(":","",str_replace("-","", str_replace(" ","",$fecha->format('Y-m-d H:i')))).".dzn";
+            
 
             //Se crea el archivo
-            $fh = fopen("datos.dzn", 'w') or  $mensaje .= "Se produjo un error al crear el archivo";
+            $fh = fopen($nombre_file, 'w') or  $mensaje .= "Se produjo un error al crear el archivo";
             
             //Escribir Array Plantas
             fwrite($fh, $string_plantas.PHP_EOL) or  $mensaje .= "No se pudo escribir el array de plantas en el archivo\n";
@@ -87,7 +92,10 @@ class Optimizar{
             fclose($fh);
             
             $mensaje .=  "Se ha escrito sin problemas\n"; 
-            $mensaje .=  shell_exec("minizinc --solver osicbc planta.mzn datos.dzn");
+            $array=[];
+            $int1="";
+            exec("minizinc --solver osicbc planta.mzn  ".$nombre_file,$array,$int1);
+
         } catch (Exception $e) {
             $mensaje.= 'Excepción capturada: '.$e->getMessage()."\n";
         }
@@ -95,6 +103,8 @@ class Optimizar{
         $response = array(
             'tipo' => 'info',
             'mensaje'=> $mensaje,
+            'data'=> $array,
+            'int'=> $int1,
             'result'=> ''
         );
 
